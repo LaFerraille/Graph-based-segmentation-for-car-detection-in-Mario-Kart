@@ -2,7 +2,7 @@ import networkx as nx
 import math
 import cv2
 import numpy as np
-from utils import distance
+from utils import distance, draw_sp_mask, draw_centroids
 
 
 class SPNode():
@@ -114,4 +114,25 @@ def gen_graph(I, SP_list, hist_ob, hist_bg, bins=(32,32,32), lambda_=0.9, sigma=
         if(u.type=='bg'):
             G.add_edge(s, u, sim=0)
             G.add_edge(t, u, sim=1+K)		
+    return G, s, t
+
+
+def img_to_graph(image, marked_ob_pixels, marked_bg_pixels, return_sp=True, algorithm=101, region_size=20, num_iter=4, bins=(32,32,32), lambda_=0.9, sigma=5):
+    SP, SP_list, hist_ob, hist_bg = gen_sp(image, marked_ob_pixels, marked_bg_pixels, algorithm, region_size, num_iter)
+    I_lab=cv2.cvtColor(image,cv2.COLOR_BGR2LAB)
+    G, s, t = gen_graph(I_lab, SP_list, hist_ob, hist_bg, bins, lambda_, sigma)
+
+    if return_sp:
+        sp_image = np.zeros(image.shape,dtype=np.uint8)
+        for sp in SP_list:
+            for pixels in sp.pixels:
+                i,j=pixels
+                sp_image[i][j]=sp.mean_lab
+        sp_image=cv2.cvtColor(sp_image, cv2.COLOR_Lab2RGB)
+        
+        sp_mask=draw_sp_mask(image,SP)
+        sp_mask=draw_centroids(sp_mask, SP_list)
+
+        return G, s, t, sp_mask, sp_image
+
     return G, s, t

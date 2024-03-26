@@ -1,12 +1,9 @@
 import sys, getopt
 import cv2
 import numpy as np
-import networkx as nx
 import matplotlib.pyplot as plt
-import math
 from graph_cut import BoykovKolmorogov
-from img_to_graph import SPNode, gen_graph, gen_sp
-from utils import draw_sp_mask, draw_centroids
+from img_to_graph import img_to_graph
 
 drawing = False
 mode = "ob"
@@ -60,8 +57,6 @@ def main():
 	I=cv2.imread(inputfile) #imread wont rise exceptions by default
 	I_dummy=np.zeros(I.shape)
 	I_dummy=np.copy(I)
-	
-	h,w,c=I.shape
 
 	cv2.namedWindow('Mark the object and background')
 	cv2.setMouseCallback('Mark the object and background',mark_seeds)
@@ -77,12 +72,10 @@ def main():
 	cv2.destroyAllWindows()
 	
 
-	I_lab = cv2.cvtColor(I, cv2.COLOR_BGR2Lab)
-	
-	SP, SP_list, hist_ob, hist_bg = gen_sp(I, marked_ob_pixels, marked_bg_pixels)
-	G, s, t = gen_graph(I_lab, SP_list, hist_ob, hist_bg)
+	G, s, t, I_marked, sp_lab = img_to_graph(I, marked_ob_pixels, marked_bg_pixels)
 	G_residual = BoykovKolmorogov(G, s, t, capacity='sim').max_flow()
 	
+	h,w,c=I.shape
 	St, _ = G_residual.graph['trees']
 	partition = (set(St), set(G) - set(St))
 	F=np.zeros((h,w),dtype=np.uint8)
@@ -92,16 +85,7 @@ def main():
 			F[i][j]=1
 	Final=cv2.bitwise_and(I,I,mask = F)
 
-	sp_lab=np.zeros(I.shape,dtype=np.uint8)
-	for sp in SP_list:
-		for pixels in sp.pixels:
-			i,j=pixels
-			sp_lab[i][j]=sp.mean_lab
-	sp_lab=cv2.cvtColor(sp_lab, cv2.COLOR_Lab2RGB)
-	
-	I_marked=draw_sp_mask(I,SP)
-	I_marked=draw_centroids(I_marked, SP_list)	
-    
+
 	plt.subplot(2,2,1)
 	plt.tick_params(labelcolor='black', top='off', bottom='off', left='off', right='off')
 	plt.imshow(I[...,::-1])
@@ -124,7 +108,6 @@ def main():
 	plt.imshow(Final[...,::-1])
 	plt.axis("off")
 	plt.xlabel("Output Image")
-
 
 	
 	cv2.imwrite("out.png",Final)
