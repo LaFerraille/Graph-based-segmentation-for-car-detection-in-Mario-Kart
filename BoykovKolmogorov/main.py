@@ -4,42 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from graph_cut import BoykovKolmorogov
 from img_to_graph import img_to_graph
-
-drawing = False
-mode = "ob"
-marked_ob_pixels=[]
-marked_bg_pixels=[]
-I=None
-I_dummy=None
-
-
-def mark_seeds(event,x,y,flags,param):
-	global drawing,mode,marked_bg_pixels,marked_ob_pixels,I_dummy
-	h,w,c=I_dummy.shape
-
-	if event == cv2.EVENT_LBUTTONDOWN:
-		drawing = True
-	elif event == cv2.EVENT_MOUSEMOVE:
-		if drawing == True:
-			if mode == "ob":
-				if(x>=0 and x<=w-1) and (y>0 and y<=h-1):
-					marked_ob_pixels.append((y,x))
-				cv2.line(I_dummy,(x-3,y),(x+3,y),(0,0,255))
-			else:
-				if(x>=0 and x<=w-1) and (y>0 and y<=h-1):
-					marked_bg_pixels.append((y,x))
-				cv2.line(I_dummy,(x-3,y),(x+3,y),(255,0,0))
-	elif event == cv2.EVENT_LBUTTONUP:
-		drawing = False
-		if mode == "ob":
-			cv2.line(I_dummy,(x-3,y),(x+3,y),(0,0,255))
-		else:
-			cv2.line(I_dummy,(x-3,y),(x+3,y),(255,0,0))
+from GUI import GUI_seeds
 
 
 def main():
-	global I,mode,I_dummy
-
 	inputfile = ''
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], "i:h", ["input-image=", "help"])
@@ -57,20 +25,9 @@ def main():
 	I=cv2.imread(inputfile) #imread wont rise exceptions by default
 	I_dummy=np.zeros(I.shape)
 	I_dummy=np.copy(I)
-
-	cv2.namedWindow('Mark the object and background')
-	cv2.setMouseCallback('Mark the object and background',mark_seeds)
-	while(1):
-		cv2.imshow('Mark the object and background',I_dummy)
-		k = cv2.waitKey(1) & 0xFF
-		if k == ord('o'):
-			mode = "ob"
-		elif k == ord('b'):
-			mode = "bg"
-		elif k == 27:
-			break
-	cv2.destroyAllWindows()
 	
+	GUI = GUI_seeds(inputfile)
+	marked_ob_pixels, marked_bg_pixels = GUI.labelling()
 
 	G, s, t, I_marked, sp_lab = img_to_graph(I, marked_ob_pixels, marked_bg_pixels)
 	G_residual = BoykovKolmorogov(G, s, t, capacity='sim').max_flow()
