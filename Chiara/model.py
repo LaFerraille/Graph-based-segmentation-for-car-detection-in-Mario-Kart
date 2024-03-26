@@ -74,12 +74,16 @@ def remove_small_components(forest, graph, min_size):
 
     return  forest
 
-def segment_graph(graph_edges, num_nodes, const, min_size, threshold_func):
+def segment_graph(graph_edges, num_nodes, const, min_size, threshold_func, previous_threshold=None):
     # Step 1: initialization
     forest = Forest(num_nodes)
     weight = lambda edge: edge[2]
     sorted_graph = sorted(graph_edges, key=weight)
-    threshold = [ threshold_func(1, const) for _ in range(num_nodes) ]
+
+    if previous_threshold is not None:
+        threshold = previous_threshold
+    else:
+        threshold = [ threshold_func(1, const) for _ in range(num_nodes) ]
 
     # Step 2: merging
     for edge in sorted_graph:
@@ -93,4 +97,4 @@ def segment_graph(graph_edges, num_nodes, const, min_size, threshold_func):
             a = forest.find(parent_a)
             threshold[a] = weight(edge) + threshold_func(forest.nodes[a].size, const)
 
-    return remove_small_components(forest, sorted_graph, min_size)
+    return remove_small_components(forest, sorted_graph, min_size),threshold

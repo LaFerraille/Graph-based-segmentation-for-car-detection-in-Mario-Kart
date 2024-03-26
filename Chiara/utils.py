@@ -1,3 +1,6 @@
+
+import os
+import moviepy.video.io.ImageSequenceClip
 import math
 from PIL import Image as PILImage
 import matplotlib.pyplot as plt
@@ -57,7 +60,7 @@ def nice_plot_bis(forest, init_image, original_image,fac):
     plt.show()
     return new_image
 
-def nice_plot_ter(forest, init_image, original_image,fac):
+def nice_plot_ter(forest, init_image, original_image,fac,verbose=True):
     from collections import defaultdict
 
     height,width = original_image.size
@@ -76,7 +79,7 @@ def nice_plot_ter(forest, init_image, original_image,fac):
         
         components_centers[comp] = (avg_x, avg_y)
 
-    filtered_components = {comp: points for comp, points in components_points.items() if len(points) < 700}
+    filtered_components = {comp: points for comp, points in components_points.items() if len(points) < 1000}
 
     centre_x = 60 #width // 2
     centre_y = 80 #height *2 // 3
@@ -95,11 +98,15 @@ def nice_plot_ter(forest, init_image, original_image,fac):
     for points in components_points[chosen]:
                     mask[points] = 1
     mask_big = cv2.resize(mask, (fac*height, fac*width), interpolation=cv2.INTER_NEAREST)
+    #change shape to (height, width, 3)
+    mask_big = np.stack([mask_big]*3, axis=-1)
     new_image = np.array(init_image)
-    new_image[mask_big == 1] = [g, g, g]
+    # new_image[mask_big == 1] = [g, g, g]
+    new_image=np.where(mask_big == 1, new_image,new_image//4)
     new_image=PILImage.fromarray(new_image).convert("RGB")
-    plt.imshow(new_image)
-    plt.show()
+    if verbose:
+        plt.imshow(new_image)
+        plt.show()
     return new_image
 
 
@@ -127,3 +134,14 @@ def get_green_mask(image_array, hue_range=(35, 90)):
     lower_hue, upper_hue = hue_range
     green_mask = cv2.inRange(hue_channel, lower_hue, upper_hue)
     return green_mask
+
+def save_video(image_folder='../img/mario_out/', video_path='../img/results/my_video.mp4', fps=2):
+    # image_files = [os.path.join(image_folder,img)
+    #             for img in os.listdir(image_folder)
+    #             if img.endswith(".JPG")]
+    image_files = [os.path.join(image_folder, f"mario_{i}.JPG")
+                   for i in range(len(os.listdir(image_folder)))
+                   if f"mario_{i}.JPG" in os.listdir(image_folder)]
+
+    clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(image_files, fps=fps)
+    clip.write_videofile(video_path)

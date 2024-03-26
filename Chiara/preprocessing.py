@@ -39,10 +39,11 @@ def get_yellow_mask(image_array,lower_yellow = np.array([20, 150, 150]),upper_ye
     return yellow_mask
 
 
-def get_segmented_image(sigma, neighbor, K, min_comp_size, image_file):
-    if neighbor != 4 and neighbor != 8:
-        print('Invalid neighborhood chosen. The acceptable values are 4 or 8.')
-        print('Segmenting with 4-neighborhood...')
+def get_segmented_image(params, image_file,verbose=False,previous_threshold=None):
+    sigma = params['sigma']
+    neighbor = params['neighbor']
+    K = params['K']
+    min_comp_size = params['min_comp_size']
 
     image_array = np.array(image_file)
     h,l,_size=image_array.shape
@@ -50,13 +51,14 @@ def get_segmented_image(sigma, neighbor, K, min_comp_size, image_file):
     smooth = Image.fromarray(image_array).filter(ImageFilter.GaussianBlur(sigma))
     smooth = np.array(smooth).astype(int)
 
-    graph_edges = build_graph(smooth, size[1], size[0], diff, neighbor == 8)
+    graph_edges = build_graph(smooth, size[1], size[0], diff, neighbor)
 
-    forest = segment_graph(graph_edges, size[0] * size[1], K, min_comp_size, threshold)
-    # im=generate_image(forest, size[1], size[0])
-    # plt.imshow(im)
-    # plt.show()
-    return forest
+    forest,t= segment_graph(graph_edges, size[0] * size[1], K, min_comp_size, threshold,previous_threshold)
+    if verbose:
+        im=generate_image(forest, size[1], size[0])
+        plt.imshow(im)
+        plt.show()
+    return forest,t
 
 def test_mask(input_file):
     image_file = Image.open(input_file)
