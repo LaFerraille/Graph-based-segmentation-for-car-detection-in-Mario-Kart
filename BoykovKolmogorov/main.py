@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from graph_cut import BoykovKolmorogov
 from img_to_graph import img_to_graph
 from GUI import GUI_seeds
+from utils import apply_mask
 
 
 def main():
@@ -25,21 +26,12 @@ def main():
 	image = cv2.imread(inputfile)
 	
 	GUI = GUI_seeds(inputfile)
-	marked_ob_pixels, marked_bg_pixels = GUI.labelling()
+	marked_ob_pixels, marked_bg_pixels, _ = GUI.labelling()
 
 	G, s, t, I_marked, sp_lab = img_to_graph(image, marked_ob_pixels, marked_bg_pixels)
 	G_residual = BoykovKolmorogov(G, s, t, capacity='sim').max_flow()
 	
-	h , w, _ = image.shape
-	St, _ = G_residual.graph['trees']
-	partition = (set(St), set(G) - set(St))
-	F=np.zeros((h,w),dtype=np.uint8)
-	for sp in partition[0]:
-		for pixels in sp.pixels:
-			i, j = pixels
-			F[i][j] = 1
-	Final = cv2.bitwise_and(image, image, mask=F)
-
+	Final = apply_mask(image, G, G_residual)
 
 	plt.subplot(2,2,1)
 	plt.tick_params(labelcolor='black', top='off', bottom='off', left='off', right='off')

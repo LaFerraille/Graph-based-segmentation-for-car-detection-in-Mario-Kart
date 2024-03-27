@@ -34,10 +34,11 @@ class GUI_seeds():
                 cv2.line(self.image,(x-3,y),(x+3,y),(255,0,0))
 
     def labelling(self):
-        cv2.namedWindow('image')
-        cv2.setMouseCallback('image', self.mark_seeds)
+        window_title = 'Press b for object and o for background. Press esc to exit.'
+        cv2.namedWindow(window_title)
+        cv2.setMouseCallback(window_title, self.mark_seeds)
         while(1):
-            cv2.imshow('image',self.image)
+            cv2.imshow(window_title, self.image)
             k = cv2.waitKey(1) & 0xFF
             if k == ord('b'):
                 self.mode = "bg"
@@ -46,4 +47,4 @@ class GUI_seeds():
             elif k == 27:
                 break
         cv2.destroyAllWindows()
-        return self.marked_ob_pixels, self.marked_bg_pixels
+        return self.marked_ob_pixels, self.marked_bg_pixels, self.image

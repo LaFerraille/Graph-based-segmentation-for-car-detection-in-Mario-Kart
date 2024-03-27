@@ -3,30 +3,6 @@ import math
 import numpy as np
 
 
-def mark_seeds(event,x,y,flags,param):
-    global drawing,mode,marked_bg_pixels,marked_ob_pixels,I_dummy
-    h,w,c=I_dummy.shape
-
-    if event == cv2.EVENT_LBUTTONDOWN:
-        drawing = True
-    elif event == cv2.EVENT_MOUSEMOVE:
-        if drawing == True:
-            if mode == "ob":
-                if(x>=0 and x<=w-1) and (y>0 and y<=h-1):
-                    marked_ob_pixels.append((y,x))
-                cv2.line(I_dummy,(x-3,y),(x+3,y),(0,0,255))
-            else:
-                if(x>=0 and x<=w-1) and (y>0 and y<=h-1):
-                    marked_bg_pixels.append((y,x))
-                cv2.line(I_dummy,(x-3,y),(x+3,y),(255,0,0))
-    elif event == cv2.EVENT_LBUTTONUP:
-        drawing = False
-        if mode == "ob":
-            cv2.line(I_dummy,(x-3,y),(x+3,y),(0,0,255))
-        else:
-            cv2.line(I_dummy,(x-3,y),(x+3,y),(255,0,0))
-
-
 def draw_sp_mask(I,SP):
 	I_marked=np.zeros(I.shape)
 	I_marked=np.copy(I)
@@ -47,3 +23,44 @@ def draw_centroids(I, SP_list):
 
 def distance(p0, p1):
 	return math.sqrt((p0[0] - p1[0])**2 + (p0[1] - p1[1])**2)
+
+
+def apply_mask(image, G, G_residual):
+	h , w, _ = image.shape
+	St, _ = G_residual.graph['trees']
+	partition = (set(St), set(G) - set(St))
+	mask = image.copy() // 4
+	
+	for sp in partition[0]:
+		for pixels in sp.pixels:
+			i, j = pixels
+			mask[i][j] = image[i][j]
+			
+	# image_mask = cv2.bitwise_and(image, image, mask=mask)
+	return mask
+
+
+def get_mask(image, G, G_residual):
+    h , w, _ = image.shape
+    St, _ = G_residual.graph['trees']
+    partition = (set(St), set(G) - set(St))
+    mask = np.zeros((h, w), np.uint8)
+    
+    for sp in partition[0]:
+        for pixels in sp.pixels:
+            i, j = pixels
+            mask[i][j] = 1
+            
+    return mask
+
+
+def process_mask(mask, threshold):
+    num_labels, labels = cv2.connectedComponents(mask.astype(np.uint8))
+    output = np.zeros_like(mask, dtype=np.uint8)
+    region_sizes = np.bincount(labels.ravel())[1:]
+
+    for label in range(1, num_labels):
+        if region_sizes[label-1] >= threshold:
+            output[labels == label] = 1
+            
+    return output
