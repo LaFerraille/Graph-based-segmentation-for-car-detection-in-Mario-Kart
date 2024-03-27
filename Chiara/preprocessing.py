@@ -49,8 +49,11 @@ def get_segmented_image(params, image_file,verbose=False,previous_threshold=None
     h,l,_size=image_array.shape
     size=l,h
     smooth = Image.fromarray(image_array).filter(ImageFilter.GaussianBlur(sigma))
+    # plt.imshow(smooth)
+    # plt.show()
     smooth = np.array(smooth).astype(int)
-
+    # plt.imshow(smooth)
+    # plt.show()
     graph_edges = build_graph(smooth, size[1], size[0], diff, neighbor)
 
     forest,t= segment_graph(graph_edges, size[0] * size[1], K, min_comp_size, threshold,previous_threshold)
