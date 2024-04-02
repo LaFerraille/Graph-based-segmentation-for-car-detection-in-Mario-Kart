@@ -7,7 +7,7 @@ from networkx.algorithms.flow.utils import build_residual_network
 
 class BoykovKolmorogov():
 
-    def __init__(self, G, s, t, capacity, resisual=None, cutoff=None):
+    def __init__(self, G, s, t, capacity, resisual=None, cutoff=None, return_intermediate=False):
         self.s = s
         self.t = t
         self.capacity = capacity
