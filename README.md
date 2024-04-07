@@ -26,21 +26,13 @@ where $P$ are the predicted masks and $GT$ are the ground truths.
 
 As shown in Table \ref{tab:miuo_results}, the two methods give similar results, with a slightly better performance for the Boykov-Kolmogorov method (higher MIoU and smaller variance).
 
-$$
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{|c|c|}
-        \hline
-        Method & mIoU \\
-        \hline
-        Tree Based (TB) & $0.58 \pm 0.24$ \\
-        Boykov-Kolmogorov (BK) & $0.59 \pm 0.21$ \\
-        \hline
-    \end{tabular}
-    \caption{Mean Intersection over Union (MIoU) on 15 annotated images}
-    \label{tab:miuo_results}
-\end{table}
-$$
+| Method               | mIoU            |
+|----------------------|-----------------|
+| Tree Based (TB)      | 0.58 ± 0.24     |
+| Boykov-Kolmogorov (BK)| 0.59 ± 0.21     |
+
+*Table: Mean Intersection over Union (MIoU) on 15 annotated images*
+
 
 ## Usage
 
