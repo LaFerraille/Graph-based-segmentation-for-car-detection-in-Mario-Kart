@@ -19,13 +19,14 @@ The Max-Flow/Min-Cut algorithm, introduced by Boykov and Kolmogorov [2], partiti
 The methods were evaluated on a set of 15 annotated images extracted from a 1 minute video containing various situations (normal, storm, tiny, bananas, ink...) using the Mean Intersection over Union (MIoU) metric:
 
 $$
-\text{MIoU}(P,GT) = \frac{\sum_{i=1}^{N} \frac{|P_i \cap GT_i|}{|P_i \cup GT_i|}}{N}
+\text{MIoU}(P,GT) = \frac{\sum \frac{|P_i \cap GT_i|}{|P_i \cup GT_i|}}{N}
 $$
 
 where $P$ are the predicted masks and $GT$ are the ground truths.
 
 As shown in Table \ref{tab:miuo_results}, the two methods give similar results, with a slightly better performance for the Boykov-Kolmogorov method (higher MIoU and smaller variance).
 
+$$
 \begin{table}[h!]
     \centering
     \begin{tabular}{|c|c|}
@@ -39,6 +40,7 @@ As shown in Table \ref{tab:miuo_results}, the two methods give similar results, 
     \caption{Mean Intersection over Union (MIoU) on 15 annotated images}
     \label{tab:miuo_results}
 \end{table}
+$$
 
 ## Usage
 
