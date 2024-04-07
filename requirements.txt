@@ -1,13 +1,13 @@
-# local package
--e .
-
-# external requirements
-click
-Sphinx
-coverage
-awscli
-flake8
+# certifi==2023.7.22
+cycler==0.10.0
+decorator==4.4.2
+kiwisolver==1.2.0
+matplotlib==3.3.1
+networkx==2.5
+numpy==1.22.0
+opencv-contrib-python
+Pillow==10.2.0
+pyparsing==2.4.7
+python-dateutil==2.8.1
+six==1.15.0
 python-dotenv>=0.5.1
-maxflow
-opencv-python
-Pillow
