@@ -2,6 +2,9 @@
 
 This repository contains code and resources for a project on car detection in Mario Kart using graph-based algorithms. The project was conducted as part of the Graphical Models course at CentraleSupélec. 
 
+[Final Report](report/Final_report.pdf) - Click here to view the final report.
+
+
 ## Introduction
 
 Image segmentation is a critical task in computer vision, particularly in scenarios like detecting cars in Mario Kart gameplay footage. This project explores the application of graph-based algorithms for segmenting cars in Mario Kart images and videos. Two main approaches were investigated: a tree-based method with masking and the Max-Flow/Min-Cut algorithm.
