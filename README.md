@@ -24,7 +24,7 @@ $$
 
 where $P$ are the predicted masks and $GT$ are the ground truths.
 
-As shown in Table \ref{tab:miuo_results}, the two methods give similar results, with a slightly better performance for the Boykov-Kolmogorov method (higher MIoU and smaller variance).
+The two methods give similar results, with a slightly better performance for the Boykov-Kolmogorov method (higher MIoU and smaller variance).
 
 | Method               | mIoU            |
 |----------------------|-----------------|
@@ -32,6 +32,8 @@ As shown in Table \ref{tab:miuo_results}, the two methods give similar results, 
 | Boykov-Kolmogorov (BK)| 0.59 ± 0.21     |
 
 *Table: Mean Intersection over Union (MIoU) on 15 annotated images*
+
+![Qualitative Results](img/results.png)
 
 
 ## Usage
